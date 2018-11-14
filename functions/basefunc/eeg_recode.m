@@ -1,0 +1,129 @@
+% eeg_recode() - recode EEG.urevent and EEG.event labels based on sequential template-matching
+%
+% Usage:
+%   >> OUTEEG = eeg_recode(INEEG, recode, overwrite)
+%
+% Inputs: 
+%   INEEG     - input EEG data structure
+%   recode    - structured variable with fields [.label, .template, .position].  Each pass only 
+%               considers events defined in "template" -- ignores others.
+%               EX: 
+%               recode(1).label    =              {'C'}; % new label    (correct response)
+%               recode(1).template = {'stim' 'corresp'}; % sequence to match (theoretical)
+%               recode(1).position =                 2 ; % position in sequence to recode
+%               recode(2).label    =              {'V'}; % new label      (valid stimulus)
+%               recode(2).template = {'stim' 'corresp'}; % sequence to match (theoretical)
+%               recode(2).position =                 1 ; % position in sequence to recode
+%               recode(3).label    =              {'E'}; % new label      (error response)
+%               recode(3).template = {'stim' 'errresp'}; % sequence to match (theoretical)
+%               recode(3).position =                 2 ; % position in sequence to recode
+%               recode(4).label    =              {'I'}; % new label    (invalid stimulus)
+%               recode(4).template = {'stim' 'errresp'}; % sequence to match (theoretical)
+%               recode(4).position =                 1 ; % position in sequence to recode
+%   overwrite - overwrite existing input events 0 = no  (default)
+%                                               1 = yes
+%
+% Outputs:
+%   OUTEEG    - modified EEG data structure
+%
+% See also: 
+%   eeg_mktriggers
+%
+% Scott Burwell, April, 2011
+function EEG = eeg_recode(EEG, recode, overwrite);
+
+if nargin==2, 
+   overwrite = 0;
+elseif overwrite>0
+   overwrite = 1;
+end
+
+%prep stim-types
+for XX = 1:length({EEG.event.type}),
+    EEG.event(XX).type = strtrim(EEG.event(XX).type);
+end
+
+if sum(ismember([recode.template],{EEG.event.type}))==0,
+   disp('eeg_recode() - No events match template, returning variable untouched');
+   return
+else,
+ 
+ rectyps = [];
+ reclats = [];
+ for RR = 1:length(recode),
+ 
+     %label
+     if iscell(recode(RR).label),
+        lab = strtrim( recode(RR).label );
+     else,
+        lab = strtrim({recode(RR).label});
+     end
+ 
+     %initiate index variables
+     Eidx = find(ismember({EEG.event.type},recode(RR).template)); %event index matching template
+     Eevt =    {EEG.event(Eidx).type}; % event-types matching template
+     Elat = [EEG.event(Eidx).latency]; % event-latencies matching template
+     Epos =     recode(RR).position-1; % position scalar, adjusted
+
+     if ~isempty(Eidx), % added 7/26/2013 by SJB, handle cases w/o a given criteria
+ 
+           % test if all numeric or not, kludge
+            NUMS = [];
+            for nn = 1:length(unique(Eevt)),
+                NUMS = [NUMS, str2num(unique(Eevt{nn}))];
+            end
+            if ~isempty(NUMS)     && length(NUMS)==length(unique(Eevt)), 
+                numbers = 1;
+            elseif ~isempty(NUMS) && length(NUMS)~=length(unique(Eevt)),
+                numbers = 0;
+                disp('Warning, mixed character and numeric event-types; not tested!');
+            else
+                numbers = 0;
+            end
+ 
+        Ridx = [];
+        if numbers==0,
+           Ridx = findstr(char(Eevt)' , char(recode(RR).template)') + Epos; % recode-idx, adjusted w/ position scalar
+        else,
+           Eevt = str2num(char(Eevt))';
+           Ridx = findstr(Eevt,str2num(char(recode(RR).template))') + Epos;
+        end
+ 
+        if ~isempty(Ridx),
+            rectyps = [rectyps repmat(lab, [1, length(Ridx)])];
+            reclats = [reclats                     Elat(Ridx)];
+        end
+
+     % TEMPORAL RECODING --------- needs adjusting if I'm going to keep
+     %lab = strtrim(recode(RR).label);
+     %X1  = strtrim(recode(RR).X1)   ;
+     %X2  = strtrim(recode(RR).X2)   ;
+     %
+     %switch recode(RR).method
+     %   
+     %   case 'temporal'
+     %   %disp('Temporal recoding scheme');
+     %   win = (recode(RR).crit*EEG.srate)/1000;
+     %   A1 = [EEG.event(ismember({EEG.event.type},X1)).latency];
+     %   A2 = [EEG.event(ismember({EEG.event.type},X2)).latency];
+     %   BIN = [];
+     %   if win>0;
+     %      for LL = 1:length(A2),
+     %          BIN = [BIN find( A1<=A2(LL) & (A2(LL))<=(A1+win) )];
+     %      end
+     %   elseif win<0,
+     %      for LL = 1:length(A2),
+     %          BIN = [BIN find( A1>=A2(LL) & (A2(LL))>=(A1+win) )];
+     %      end
+     %   end
+     %end    
+     %evtype = [evtype repmat(lab, [1, length(BIN)])];
+     %evtlat = [evtlat A1(BIN)];
+     end
+ end
+ [EEG.urevent EEG.event] = eeg_mktriggers(EEG, rectyps, reclats, overwrite);
+ EEG = pop_editeventvals(EEG, 'sort', {'latency' 0});
+ EEG = eeg_checkset(EEG);
+
+end
+
