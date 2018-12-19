@@ -55,8 +55,10 @@
 function EEG = proc_commander(process, config)
 
 if nargin<2, 
-   disp('Insufficient number of arguments to proc_commander.'); 
-   return
+   %disp('Insufficient number of arguments to proc_commander.'); 
+   %return
+   P = process;
+   C(1).userinput = '   disp(''proc_commander(); no configuration script defined, proceeding without one...'');';
 else,
    P = process; clear process
    C = config ;
