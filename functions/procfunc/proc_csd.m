@@ -32,7 +32,7 @@
 % See also: proc_interp, CSD-toolbox
 function EEG = proc_csd(EEG, varargin);
 
-CSDpath = '/labs/mctfr-psyphys/shared_apps/CSDtoolbox'; addpath(genpath(CSDpath)); 
+%CSDpath = '/labs/mctfr-psyphys/shared_apps/CSDtoolbox'; addpath(genpath(CSDpath)); %drop this line?
 
 if nargin<2,
    disp('Insufficient input, abort');
