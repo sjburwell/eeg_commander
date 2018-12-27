@@ -15,10 +15,14 @@
 %   'montage'   - file containing channel labels/locations.  
 %                 If 'type'=='full', required as input.
 %                 options: >> help readlocs()
-%   'interpmaj' - if a channel is marked as artifact for majority of dataset, 
-%                 interpolate totally.
+%   'interpmaj' - if a channel is marked as artifact for >P% of time, 
+%                 interpolate totally. P defined in "rejpctbad" below (default: 50%)
 %                 options: yes = 1 (default); 
 %                          no  = 0;
+%   'rejpctbad' - maximum percent of time (epochs) for a given channel marked as artifact
+%                 allowed before interpolating the whole thing
+%                 options: integer value between 0 and 100,
+%                          default = 50;
 %   'rejthresh' - maximum percent of channels within an epoch before skipping 
 %                 and tagging epoch as artifact
 %                 options: integer value between 0 and 100, 
@@ -70,6 +74,20 @@ if ~isempty(strmatch('full',args.type)),
       disp(['Cannot find file: ' args.montage]);
       return
    end
+elseif ~isempty(strmatch('channel',args.type)),
+   intfull = 0;
+   if exist(args.montage,'file'),
+      chanlocs = readlocs(args.montage); if isempty(chanlocs), disp('  chanlocs invalid!'); end
+      fldiff = setdiff(fieldnames(chanlocs), fieldnames(EEG.chanlocs));
+      if ~isempty(fldiff),
+         for ff = 1:length(fldiff),
+             chanlocs = rmfield(chanlocs, fldiff{ff});
+         end
+      end
+   else
+      disp(['Cannot find file: ' args.montage]);
+      return
+   end
 elseif ~isempty(strmatch('artifact',args.type)),
    intfull = 0;
    chanlocs = EEG.chanlocs;
@@ -82,6 +100,9 @@ end
 if ~isfield(args,'rejthresh')||isempty(args.rejthresh),
     args.rejthresh = 25;
 end
+if ~isfield(args,'rejpctbad')||isempty(args.rejpctbad),
+    args.rejpctbad = 50;
+end
 if ~isfield(args,'rejreject')||isempty(args.rejreject),
     args.rejreject =  0;
 end
@@ -89,18 +110,21 @@ end
 % initiate interpE
 EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);
 %EEG = eeg_hist(EEG, 'EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);');
-if isempty(find(EEG.reject.rejglobalE))&&intfull==0,
-   disp('Rejected channels empty, abort operation');
-   return
+%if isempty(find(EEG.reject.rejglobalE))&&intfull==0, %does this case even make sense???
+%   disp('Rejected channels empty, abort operation');
+%   return
+if intfull==0,
+   interpE = zeros([EEG.nbchan  EEG.trials]);
 elseif isempty(find(EEG.reject.rejglobalE))&&intfull==1,
    interpE = zeros([EEG.nbchan  EEG.trials]);
 else,
    interpE = EEG.reject.rejglobalE;
 end
 
-% whole-channel; total recode if >50% artifact
+% whole-channel; total recode if >% artifact
 if args.interpmaj>0,
-   recode1 = find(sum(interpE')>(.5*EEG.trials));
+   %recode1 = find(sum(interpE')>((args.rejpctbad/100)*EEG.trials));
+   recode1 = find(sum(EEG.reject.rejglobalE')>((args.rejpctbad/100)*EEG.trials)); %changed 12-27-18 to accommodate the 'type'=='channel' option
    if ~isempty(recode1),
        interpE(recode1,:) = 1;
    end
@@ -134,7 +158,7 @@ end
 
 % reject/interp accounting 
 if ~isempty(find(rejT))&&args.rejreject==1,
-   EEG = pop_select(EEG, 'notrial', find(rejT));
+   EEG = proc_select(EEG, 'notrial', find(rejT));
    EEG.reject.rejmanualE   = interpE(:,find(rejT==0));
    EEG.reject.rejmanual    = find(sum(EEG.reject.rejmanualE));
    EEG.reject.rejmanualcol = [0.5 0.5 0.5];  
