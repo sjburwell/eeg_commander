@@ -113,9 +113,14 @@ EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);
 %if isempty(find(EEG.reject.rejglobalE))&&intfull==0, %does this case even make sense???
 %   disp('Rejected channels empty, abort operation');
 %   return
-if intfull==0,
-   interpE = zeros([EEG.nbchan  EEG.trials]);
-elseif isempty(find(EEG.reject.rejglobalE))&&intfull==1,
+%if intfull==0,
+%   interpE = zeros([EEG.nbchan  EEG.trials]);
+%elseif isempty(find(EEG.reject.rejglobalE))&&intfull==1,
+%   interpE = zeros([EEG.nbchan  EEG.trials]);
+%else,
+%   interpE = EEG.reject.rejglobalE;
+%end
+if isempty(find(EEG.reject.rejglobalE)),
    interpE = zeros([EEG.nbchan  EEG.trials]);
 else,
    interpE = EEG.reject.rejglobalE;
@@ -143,7 +148,7 @@ end
 % interpolate
 XSTCHANS = find( ismember({chanlocs.labels},{EEG.chanlocs.labels}));
 ADDCHANS = find(~ismember({chanlocs.labels},{EEG.chanlocs.labels}));
-if ~isempty(find(interpE)),
+if ~isempty(find(interpE)) && intfull==1,
    EEG = eeg_interp3d_spl(EEG, interpE); %chan-epoch
    %EEG = eeg_hist(EEG, 'EEG = eeg_interp3d_spl(EEG, EEG.reject.rejglobalE)');
 end
