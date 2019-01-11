@@ -130,9 +130,10 @@ end
 if args.interpmaj>0,
    %recode1 = find(sum(interpE')>((args.rejpctbad/100)*EEG.trials));
    recode1 = find(sum(EEG.reject.rejglobalE')>((args.rejpctbad/100)*EEG.trials)); %changed 12-27-18 to accommodate the 'type'=='channel' option
-   if ~isempty(recode1),
-       interpE(recode1,:) = 1;
-   end
+   if ~isempty(recode1), interpE(recode1,:) = ''; EEG = proc_select(EEG,'nochannel',recode1); end
+   %if ~isempty(recode1),
+   %    interpE(recode1,:) = 1;
+   %end
 end
 
 % channel-epoch; skip trial if >*pct* w/ in trial artifact, output: rejT
@@ -148,7 +149,7 @@ end
 % interpolate
 XSTCHANS = find( ismember({chanlocs.labels},{EEG.chanlocs.labels}));
 ADDCHANS = find(~ismember({chanlocs.labels},{EEG.chanlocs.labels}));
-if ~isempty(find(interpE)) && intfull==1,
+if ~isempty(find(interpE)), % && intfull==1,  %<-this second clause may be impeding 'artifact' interpolation ??? SJB 2019-01-09
    EEG = eeg_interp3d_spl(EEG, interpE); %chan-epoch
    %EEG = eeg_hist(EEG, 'EEG = eeg_interp3d_spl(EEG, EEG.reject.rejglobalE)');
 end
@@ -167,11 +168,19 @@ if ~isempty(find(rejT))&&args.rejreject==1,
    EEG.reject.rejmanualE   = interpE(:,find(rejT==0));
    EEG.reject.rejmanual    = find(sum(EEG.reject.rejmanualE));
    EEG.reject.rejmanualcol = [0.5 0.5 0.5];  
+   EEG.reject.rejglobalE   = EEG.reject.rejmanualE;
+   EEG.reject.rejglobal    = EEG.reject.rejmanual;
 else,
    EEG.reject.rejglobal  =                 rejT;
    EEG.reject.rejglobalE =              interpE;
    EEG.reject.rejmanual(find(sum(interpE))) = 1; 
    EEG.reject.rejmanualE =              interpE;
+   EEG.reject.rejmanualcol = [0.5 0.5 0.5];
+
+   EEG.reject.rejmanual(   find(rejT)) = 1;
+   EEG.reject.rejmanualE(:,find(rejT)) = 1;
+   EEG.reject.rejglobal(   find(rejT)) = 1;
+   EEG.reject.rejglobalE(:,find(rejT)) = 1;
 end
 
 
