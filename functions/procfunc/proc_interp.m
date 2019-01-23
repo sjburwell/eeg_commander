@@ -10,6 +10,7 @@
 %                 and/or restore full channel montage. *REQUIRED INPUT*
 %                 options: 'full'     = total montage restored and artifact corrected
 %                          'artifact' = just artifact indices interpolated
+%                          'channel'  = just artifact or missing full channels (i.e., not chan-epochs)
 %
 % Additional inputs ('key','val'):
 %   'montage'   - file containing channel labels/locations.  
@@ -149,13 +150,11 @@ end
 % interpolate
 XSTCHANS = find( ismember({chanlocs.labels},{EEG.chanlocs.labels}));
 ADDCHANS = find(~ismember({chanlocs.labels},{EEG.chanlocs.labels}));
-if ~isempty(find(interpE)), % && intfull==1,  %<-this second clause may be impeding 'artifact' interpolation ??? SJB 2019-01-09
+if ~isempty(find(interpE)) && ismember(args.type,{'full','artifact'}), % SJB 2019-01-22
    EEG = eeg_interp3d_spl(EEG, interpE); %chan-epoch
-   %EEG = eeg_hist(EEG, 'EEG = eeg_interp3d_spl(EEG, EEG.reject.rejglobalE)');
 end
 if ~isempty(ADDCHANS),
    EEG = eeg_interp(EEG, chanlocs); %whole-channel
-   %EEG = eeg_hist(EEG, 'EEG = eeg_interp(EEG, args.montage);');
    newE  = zeros(length(chanlocs), size(interpE,2));
    newE(XSTCHANS,:) = interpE;
    newE(ADDCHANS,:) =       1;

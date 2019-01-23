@@ -1,7 +1,8 @@
 %EEG1 = pop_loadset('/labs/burwellstudy/projects/testing-eeg-toolbox/output_data/201810291300_sub000502_ses01_run03_cnt_epoch_emg.set');
 %EEG2 = pop_loadset('/labs/burwellstudy/projects/testing-eeg-toolbox/output_data/201810291300_sub000502_ses01_run04_cnt_epoch_emg.set'); EEG = pop_mergeset(EEG1,EEG2,1);
 %EEG  = pop_loadset('/labs/burwellstudy/projects/testing-eeg-toolbox/output_data/Acquisition 97_cnt_epoch_emg.set');
-EEG = pop_loadset('/labs/burwellstudy/projects/testing-eeg-toolbox/output_data/201812041510_sub000504_ses01_run03_cnt_epoch_npuemg.set');
+%EEG = pop_loadset('/labs/burwellstudy/projects/testing-eeg-toolbox/output_data/201812041510_sub000504_ses01_run03_cnt_epoch_npuemg.set');
+EEG = pop_loadset;
 
 ylimits  = [   -5, 40 ];
 audtimes = [ 3800,4500];
