@@ -14,7 +14,7 @@
 %                                   at detecting muscle bursts
 %                       'grad-med': median-gradient - uses diff()
 %                          'spPCA': median absolute-valued coefficient
-%                           'Vmax': maximum value
+%                           'Vmax': maximum absolute value
 %                        'Vmedian': median value
 %                       'corr-min': minimum cross-channel correlation
 %                       'corr-med': median  "  "

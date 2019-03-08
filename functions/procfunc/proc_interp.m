@@ -165,7 +165,7 @@ end
 if ~isempty(find(rejT))&&args.rejreject==1,
    EEG = proc_select(EEG, 'notrial', find(rejT));
    EEG.reject.rejmanualE   = interpE(:,find(rejT==0));
-   EEG.reject.rejmanual    = find(sum(EEG.reject.rejmanualE));
+   EEG.reject.rejmanual(find(sum(EEG.reject.rejmanualE))) = 1; % = find(sum(EEG.reject.rejmanualE)); 2019-03-06 SJB
    EEG.reject.rejmanualcol = [0.5 0.5 0.5];  
    EEG.reject.rejglobalE   = EEG.reject.rejmanualE;
    EEG.reject.rejglobal    = EEG.reject.rejmanual;

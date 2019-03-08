@@ -104,7 +104,7 @@ switch args.type,
             EEG = eeg_interp( EEG, bad_elecs, 'spherical');
          elseif reject_on==1&&interp_on==0,
             tmprej = EEG.reject;
-            EEG = pop_select( EEG, 'nochannel', bad_elecs);
+            EEG = proc_select( 'nochannel', bad_elecs); %EEG = pop_select( EEG, 'nochannel', bad_elecs);
             %EEG = eeg_hist(EEG, ['EEG = pop_select(EEG,''nochannel'',[' num2str(bad_elecs) ']); % label(s): ' EEG.chanlocs(bad_elecs).label]);
             EEG.reject = tmprej; EEG.reject.rejmanualE(bad_elecs,:) = '';
          end
@@ -130,7 +130,7 @@ switch args.type,
       end
       if ~isempty(bad_epochs) && isfield(args,'reject') && args.reject>0,
          tmprej = EEG.reject;
-         EEG = pop_select( EEG, 'notrial', bad_epochs);
+         EEG = proc_select( EEG, 'notrial', bad_epochs); %EEG = pop_select( EEG, 'notrial', bad_epochs);
          %EEG = eeg_hist(EEG, ['EEG = pop_select(EEG,''notrial'',[' num2str(bad_epochs) ']);']);
          EEG.reject = tmprej;
          EEG.reject.rejmanual(bad_epochs) = ''; EEG.reject.rejmanualE(:,bad_epochs) = '';
@@ -181,17 +181,17 @@ switch args.type,
              tmprej = EEG.reject;
              delstring = []; for d = 1:size(delete_chan,2), delstring = [delstring ' ' char({EEG.chanlocs(delete_chan(d)).labels})]; end
              disp(['   proc_artifact; The following channel(s) will be deleted for ' EEG.filename ': ' delstring]);
-             EEG = pop_select( EEG, 'nochannel', delete_chan);
+             EEG = proc_select( EEG, 'nochannel', delete_chan); %EEG = pop_select( EEG, 'nochannel', delete_chan);
              EEG.reject = tmprej; EEG.reject.rejmanualE(delete_chan,:) = '';
           end
           if trialrej_on>0&&~isempty(find(sum(EEG.reject.rejmanualE)==EEG.nbchan)),
              delete_trial = find(sum(EEG.reject.rejmanualE)==EEG.nbchan);
              if length(delete_trial)==EEG.trials,
                 disp(['   proc_artifact; all trials artifact for ' EEG.filename ', deleting all data...']);
-                EEG = pop_select(EEG, 'nochannel', 1:EEG.nbchan);
+                EEG = proc_select( EEG, 'nochannel', 1:EEG.nbchan); %EEG = pop_select(EEG, 'nochannel', 1:EEG.nbchan);
              else,
                 tmprej = EEG.reject;
-                EEG = pop_select( EEG, 'notrial', delete_trial);
+                EEG = proc_select( EEG, 'notrial', delete_trial); %EEG = pop_select( EEG, 'notrial', delete_trial);
                 EEG.reject = tmprej; 
                 EEG.reject.rejmanual(   delete_trial) = '';
                 EEG.reject.rejmanualE(:,delete_trial) = '';                   
@@ -199,6 +199,7 @@ switch args.type,
           end
           %EEG.reject.rejmanual(find(sign(sum(EEG.reject.rejmanualE)))) = 1;  
           EEG.reject.rejmanual = double(sum(EEG.reject.rejmanualE)>0);
+      
    end
 
    case 'chan-epoch',
