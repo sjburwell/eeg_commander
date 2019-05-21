@@ -35,6 +35,8 @@ if ~isfield(args, 'opts'),
 end
 EEG = eeg_hist(EEG, ['EEG = ' mfilename '(EEG, ' arg2str(args) ');'] );
 
+
+
 % specify input data matrix
 if isfield(args,'datafilt') && EEG.trials>1 && args.datafilt>0,
    EEG.reject.rejglobal = []; EEG.reject.rejglobalE = [];
@@ -83,11 +85,11 @@ switch args.type,
      end;
 
    case 'amica',
-     if ~exist('runamica12'), disp(['Must have amica in path, see: https://sccn.ucsd.edu/~jason/amica_web.html']); return; end
+     if ~exist('runamica15'), disp(['Must have amica15 in path, see: https://sccn.ucsd.edu/~jason/amica_web.html']); return; end
      if ~isempty(args.opts),
-        [EEG.icaweights, EEG.icasphere, mods] = runamica12(icadata, args.opts{:});
+        [EEG.icaweights, EEG.icasphere, mods] = runamica15(icadata, args.opts{:});
      else,
-        [EEG.icaweights, EEG.icasphere, mods] = runamica12(icadata);
+        [EEG.icaweights, EEG.icasphere, mods] = runamica15(icadata);
      end
 
    otherwise,

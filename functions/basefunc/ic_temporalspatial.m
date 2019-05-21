@@ -57,7 +57,8 @@ if size(EEG.icawinv,2)>size(ICWINV.icwinv,1),
    return
 elseif size(EEG.icawinv,2)<size(ICWINV.icwinv,1),
    if V>0, disp('  Adjusting inverse weights from spatial input to match existing chanlocs...'); end
-   rdcidx = find(ismember(ICWINV.labels,{EEG.chanlocs.labels})); % assumes sorted the same, maybe change
+%   rdcidx = find(ismember(ICWINV.labels,{EEG.chanlocs.labels})); % assumes sorted the same, maybe change
+   rdcidx = find(ismember(ICWINV.labels,{EEG.chanlocs(find(EEG.icachansind)).labels})); % assumes sorted the same, maybe change %UPDATED 2019-5-20
    icwinvtemp = ICWINV.icwinv;  clear ICWINV
    ICWINV = icwinvtemp(rdcidx); clear icwinvtemp
 else,

@@ -108,6 +108,11 @@ if ~isfield(args,'rejreject')||isempty(args.rejreject),
     args.rejreject =  0;
 end
 
+if args.rejthresh>50, 
+   disp('   proc_interp;  resetting rejthresh to 50, cannot interpolate >50% of channels'); 
+   args.rejthresh = 50;
+end
+
 % initiate interpE
 EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);
 %EEG = eeg_hist(EEG, 'EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);');
@@ -150,14 +155,27 @@ end
 % interpolate
 XSTCHANS = find( ismember({chanlocs.labels},{EEG.chanlocs.labels}));
 ADDCHANS = find(~ismember({chanlocs.labels},{EEG.chanlocs.labels}));
+MISCHANS = find(~ismember({EEG.chanlocs.labels},{chanlocs.labels}));   % SJB 2019-05-13, in case of extra non-interpolated channels not in XSTCHANS
 if ~isempty(find(interpE)) && ismember(args.type,{'full','artifact'}), % SJB 2019-01-22
    EEG = eeg_interp3d_spl(EEG, interpE); %chan-epoch
 end
+
 if ~isempty(ADDCHANS),
    EEG = eeg_interp(EEG, chanlocs); %whole-channel
    newE  = zeros(length(chanlocs), size(interpE,2));
+   if ~isempty(MISCHANS), 
+      interpEmis       = interpE(MISCHANS,:); 
+      interpE(MISCHANS,:) = ''; 
+   end
    newE(XSTCHANS,:) = interpE;
    newE(ADDCHANS,:) =       1;
+   if ~isempty(MISCHANS), 
+      newE = [newE; interpEmis];
+      EEG.data     = [EEG.data;     EEG.data(1:length(MISCHANS),:,:)];
+      EEG.data(1:length(MISCHANS),:,:) = '';
+      EEG.chanlocs = [EEG.chanlocs EEG.chanlocs(1:length(MISCHANS))];
+      EEG.chanlocs(1:length(MISCHANS)) = '';
+   end
    interpE = newE;
 end
 
