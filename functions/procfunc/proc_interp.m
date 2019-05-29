@@ -114,22 +114,18 @@ if args.rejthresh>50,
 end
 
 % initiate interpE
-EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);
-%EEG = eeg_hist(EEG, 'EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);');
-%if isempty(find(EEG.reject.rejglobalE))&&intfull==0, %does this case even make sense???
-%   disp('Rejected channels empty, abort operation');
-%   return
-%if intfull==0,
-%   interpE = zeros([EEG.nbchan  EEG.trials]);
-%elseif isempty(find(EEG.reject.rejglobalE))&&intfull==1,
-%   interpE = zeros([EEG.nbchan  EEG.trials]);
-%else,
-%   interpE = EEG.reject.rejglobalE;
-%end
-if isempty(find(EEG.reject.rejglobalE)),
-   interpE = zeros([EEG.nbchan  EEG.trials]);
-else,
-   interpE = EEG.reject.rejglobalE;
+if length(size(EEG.data))==3,
+  EEG = eeg_rejsuperpose(EEG,1,1,1,1,1,1,1,1);
+  if isempty(find(EEG.reject.rejglobalE)),
+     interpE = zeros([EEG.nbchan  EEG.trials]);
+  else,
+     interpE = EEG.reject.rejglobalE;
+  end
+else 
+  if isempty(find(EEG.reject.rejglobalE)) || size(EEG.reject.rejglobalE,2)==size(EEG.data,2),
+     EEG = eeg_checkset(rmfield(EEG,'reject'));
+     interpE = zeros([EEG.nbchan EEG.trials]);
+  end
 end
 
 % whole-channel; total recode if >% artifact
