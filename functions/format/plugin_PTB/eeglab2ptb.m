@@ -111,10 +111,7 @@ if nswps>1,
    if ~isempty(args.icaact) && args.icaact>0, 
       EEG.data = EEG.data-repmat(mean(EEG.data,2),[1 nbins 1]);
       for ss = 1:nswps,
-          %erp.data(erp.sweep==ss,:) = EEG.icaweights*EEG.icasphere*squeeze(EEG.data(:,:,ss));
-          erp.data(erp.sweep==ss,:) = EEG.icaweights(:,EEG.icachansind) * ...
-                                      EEG.icasphere(EEG.icachansind,:)  * ...
-                                      squeeze(EEG.data(EEG.icachansind,:,ss)); %switched w/ above 3/7/15
+          erp.data(erp.sweep==ss,:) = (EEG.icaweights * EEG.icasphere) * squeeze(EEG.data(EEG.icachansind,:,ss)); 
           if ~isempty(args.icaproj),
              if     strcmp('maxabs',args.icaproj),
                [junk, proji] = max(abs(EEG.icawinv));                  %find max(abs)
@@ -123,7 +120,9 @@ if nswps>1,
                proji   = strmatch(args.icaproj,{EEG.chanlocs.labels}); %find a specific channel
                projval = EEG.icawinv(proji,:);
              end
-             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:).*repmat(projval,[1,size(erp.data,2)]);
+             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:).*repmat(projval,[1,size(erp.data,2)]); %should this instead be "/"??? SJB
+          else,
+             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(rms(EEG.icawinv,1)',[1 size(erp.data,2)]); %this is RMS microvolt: https://sccn.ucsd.edu/pipermail/eeglablist/2015/010041.html
           end
       end
    else,
