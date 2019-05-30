@@ -14,7 +14,9 @@
 %                given stimulus 
 %   'icaact'   - output independent component activations, rather than scalp data
 %   'icaproj'  - 'maxabs' (for maximum absolute-valued ICA inverse-weight) or string of
-%                desired channel (e.g., 'CZ'), latter must match value in {EEG.chanlocs.label}
+%                desired channel (e.g., 'CZ'), latter must match value in {EEG.chanlocs.label}. 
+%                Otherwise, 'maprms' which is equivalent (I believe) to "RMS uV", see:
+%                https://sccn.ucsd.edu/pipermail/eeglablist/2015/010041.html
 %   'savefile' - character array denoting output file to save (if desired) 
 %
 % Outputs:
@@ -115,14 +117,16 @@ if nswps>1,
           if ~isempty(args.icaproj),
              if     strcmp('maxabs',args.icaproj),
                [junk, proji] = max(abs(EEG.icawinv));                  %find max(abs)
-               projval = diag(EEG.icawinv(proji,:));
-             else
+               erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(diag(EEG.icawinv(proji,:)),[1,size(erp.data,2)]);
+             elseif ~isempty(strmatch(args.icaproj,{EEG.chanlocs.labels})),
                proji   = strmatch(args.icaproj,{EEG.chanlocs.labels}); %find a specific channel
-               projval = EEG.icawinv(proji,:);
+               erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(EEG.icawinv(proji,:),[1,size(erp.data,2)]);
+             else,
+               disp('   eeglab2ptb; invalid arguement for "icaproj", defaulting to "maprms"');               
+               erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(rms(EEG.icawinv,1)',[1 size(erp.data,2)]);
              end
-             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:).*repmat(projval,[1,size(erp.data,2)]); %should this instead be "/"??? SJB
           else,
-             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(rms(EEG.icawinv,1)',[1 size(erp.data,2)]); %this is RMS microvolt: https://sccn.ucsd.edu/pipermail/eeglablist/2015/010041.html
+             erp.data(erp.sweep==ss,:) = erp.data(erp.sweep==ss,:)./repmat(rms(EEG.icawinv,1)',[1 size(erp.data,2)]); %RMS microvolt: I think equivalent to "mapnorm" in spectopo.m
           end
       end
    else,
