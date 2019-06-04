@@ -1,4 +1,4 @@
-function EEG = eeg_icartifact_eyes(EEG, stat, crit);
+function [EEG, ICs] = eeg_icartifact_eyes(EEG, stat, crit);
 % EEG = eeg_icartifact_eyes(EEG, stat, crit);
 % NOTE: this function is deprecated, see its replacement >>help proc_subcomp 
 %make sure ICA done!
@@ -47,6 +47,7 @@ elseif isempty(strmatch('Veog+',{EEG.chanlocs.labels}))&& isempty(strmatch('FP1'
         CRIT_ELECS = { 'AF3' };
     else,
         disp(['   eeg_icartifact_eyes; No criterion channel found for ' EEG.filename ', aborting blink correction...']);
+        ICs = [];
         return
     end
 end
@@ -79,6 +80,7 @@ elseif ~isempty(strmatch(   'F8',{EEG.chanlocs.labels})) && ~isempty(strmatch(  
     CRIT_ELECS = {   'F8';    'F7'};
 else
     disp(['   eeg_icartifact_eyes; No criterion channel found for ' EEG.filename ', aborting horizontal eye movement correction...']);
+    ICs = [];
     return
 end
 [ICs, hem_corrs] = ic_temporalspatial(EEG, SPATIAL, CRIT_ELECS, THRESHOLD, 0);
@@ -129,6 +131,7 @@ else
             EEG = pop_subcomp(EEG, ICs);
         else,
             disp([EEG.filename '; no temporal-spatial ICs identified, skipping IC-removal.']);
+            ICs = [];
         end
     end
 end
