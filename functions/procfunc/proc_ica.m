@@ -58,7 +58,8 @@ end
 %prep data
 icadata = EEG.data(filtelx,:,filtepx);
 for ee=1:size(icadata,3), icadata(:,:,ee)=icadata(:,:,ee)-repmat(mean(icadata(:,:,ee)')',1,size(icadata,2)); end
-icadata = single(reshape(permute(double(icadata), [2 3 1]), [size(icadata,2)*size(icadata,3) size(icadata,1)])');
+icadata = reshape(permute(double(icadata), [2 3 1]), [size(icadata,2)*size(icadata,3) size(icadata,1)])';
+if isa(EEG.data,'single'), icadata = single(icadata); end
 
 %make sure actual data exists
 if size(icadata)==[0  0], disp(['   proc_ica; data matrix for ica empty, aborting operation (' EEG.filename ')...']); return; end

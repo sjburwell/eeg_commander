@@ -27,7 +27,11 @@ EEG.pnts    =                           NP*NT;
 EEG.xmin    =                               0;
 EEG.xmax    = (EEG.pnts-1)/EEG.srate+EEG.xmin;
 EEG.times   =                              [];
-EEG.data    = single(reshape(permute(double(EEG.data), [2 3 1]), [NT*NP NC])');
+if isa(EEG.data,'single'), 
+ EEG.data    = single(reshape(permute(double(EEG.data), [2 3 1]), [NT*NP NC])');
+else,
+ EEG.data    =        reshape(permute(double(EEG.data), [2 3 1]), [NT*NP NC])';
+end
 
 %-- events, epochs
 EEG    = eeg_checkset(EEG,'makeur');                          %SJB: added   8-21-2018

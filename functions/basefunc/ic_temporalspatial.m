@@ -39,7 +39,11 @@ Nc   = EEG.nbchan;
 Nt   = EEG.trials;
 if length(size(EEG.data))==3, 
    if V>0, disp('  Restructuring data to 2D...'); end
-   data = single(reshape(permute(double(EEG.data), [2 3 1]), [Nt*Np Nc])');
+   if isa(EEG.data,'single'),
+     data    = single(reshape(permute(double(EEG.data), [2 3 1]), [Nt*Np Nc])');
+   else,
+     data    =        reshape(permute(double(EEG.data), [2 3 1]), [Nt*Np Nc])';
+   end
 else
    data = EEG.data;
 end
