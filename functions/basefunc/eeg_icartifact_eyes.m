@@ -101,7 +101,7 @@ eyespace  = abs(atanh([blink_corrs(:,1); hem_corrs(:,1)]));
 eyetime   = abs(atanh([blink_corrs(:,2); hem_corrs(:,2)])); 
 [timemeas ,timecrit ] = thresholder(stat, eyetime , crit);
 
-all_ics = [1:length(EEG.icawinv), 1:length(EEG.icawinv)];
+all_ics = [1:size(EEG.icawinv,2), 1:size(EEG.icawinv,2)];
 if ~isempty(intersect(find(spacemeas>spacecrit),find(timemeas>timecrit)));
     disp([EEG.filename '; threshold(s): [' num2str([THRESHOLD.crit]) ']'])
     ICs = all_ics(intersect(find(spacemeas>spacecrit),find(timemeas>timecrit)));

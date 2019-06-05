@@ -127,7 +127,7 @@ time   = abs(atanh(  reshape(temp_spat_corrs(:,2,:),[prod(size(temp_spat_corrs(:
 [spacemeas,spacecrit] = thresholder(args.threshold(1).stat, space, args.threshold(1).crit);
 [timemeas ,timecrit ] = thresholder(args.threshold(1).stat, time , args.threshold(1).crit);
 
-all_ics = repmat([1:length(EEG.icawinv)],[1,length(args.spatial)]);
+all_ics = repmat([1:size(EEG.icawinv,2)],[1,length(args.spatial)]);
 if ~isempty(intersect(find(spacemeas>spacecrit),find(timemeas>timecrit)));
     disp([EEG.filename '; threshold(s): [' num2str([THRESHOLD.crit]) ']'])
     ICs = all_ics(intersect(find(spacemeas>spacecrit),find(timemeas>timecrit)));
