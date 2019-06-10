@@ -11,7 +11,7 @@ This is a MATLAB pipeline for easy-to-program automated pre-processing of electr
 
 # Additional useful low-level functions:
 * Identification of salt-bridge artifacts based on the electrical distance (Tenke et al., 2001), see get_elecdists()
-* Removal of muscle-artifacts (i.e., white-noise signals) based on canonical correlation (De Clercq et al., 2006), see bsscca_correct_emg()
+* Removal of muscle-artifacts (i.e., white-noise signals) based on canonical correlation or independent components (De Clercq et al., 2006), see bsscca_correct_emg() and bssica_correct_emg(), respectively
 * Easy-to-implement Current Source Density transformation (http://psychophysiology.cpmc.columbia.edu/Software/CSDtoolbox/), see proc_CSD()
 
 # Citation:
