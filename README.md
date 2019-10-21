@@ -18,7 +18,7 @@ Burwell, S. J., Malone, S. M., Bernat, E. M., & Iacono, W. G. (2014). Does elect
 * Easy-to-implement Current Source Density transformation (http://psychophysiology.cpmc.columbia.edu/Software/CSDtoolbox/), see proc_CSD()
 
 # How to use:
-```julia
+```matlab
 %% 1. Add MATLAB path to local copy of EEGLAB (strongly recommended to use version 14.1.1b or above, issues with pop_resample) 
 eeglab; %keeping EEGLAB GUI open is optional, to close, simply type "close;"
 %% 2. Add MATLAB path to local copy of eeg_commander directory
