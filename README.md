@@ -1,5 +1,8 @@
 # eeg_commander
-This is a MATLAB pipeline for easy-to-program automated pre-processing of electroencephalogram (EEG) data using independent component analysis (ICA) and statistically-robust detection of artifacts. It is intended to work similar to a plug-in for the EEGLAB (https://sccn.ucsd.edu/eeglab/index.php) software suite, but it additionally contains low-level functions that work on simpler data arrays (e.g., 2- or 3-dimensional matrices) that may be useful for commandline artifact detection and removal. Generally, the EEG pipeline is designed to successively prune EEG artifacts identified in 1) one-second contiguous segments in the continuous data, in 2) grossly bad data channels, in 3) spatiotemporal stereotyped ICA artifacts, and in 4) channel/time-segments (e.g., trial epochs). _It is strongly recommended that EEGLAB version 14.1.1b  or above is in the user's MATLAB path._
+This is a MATLAB pipeline for easy-to-program automated pre-processing of electroencephalogram (EEG) data using independent component analysis (ICA) and statistically-robust detection of artifacts. It is intended to work similar to a plug-in for the EEGLAB (https://sccn.ucsd.edu/eeglab/index.php) software suite, but it additionally contains low-level functions that work on simpler data arrays (e.g., 2- or 3-dimensional matrices) that may be useful for commandline artifact detection and removal. Generally, the EEG pipeline is designed to successively prune EEG artifacts identified in 1) one-second contiguous segments in the continuous data, in 2) grossly bad data channels, in 3) spatiotemporal stereotyped ICA artifacts, and in 4) channel/time-segments (e.g., trial epochs). _It is strongly recommended that EEGLAB *version 14.1.1b*  or above is in the user's MATLAB path._
+
+# Citation:
+Burwell, S. J., Malone, S. M., Bernat, E. M., & Iacono, W. G. (2014). Does electroencephalogram phase variability account for reduced P3 brain potential in externalizing disorders?. Clinical Neurophysiology, 125(10), 2007-2015.
 
 # Notable features of the EEG pipeline include:
 * Removal of independent components that match spatial and temporal criterion (e.g., blinks, saccades)
@@ -14,6 +17,10 @@ This is a MATLAB pipeline for easy-to-program automated pre-processing of electr
 * Removal of muscle-artifacts (i.e., white-noise signals) based on canonical correlation or independent components (De Clercq et al., 2006), see bsscca_correct_emg() and bssica_correct_emg(), respectively
 * Easy-to-implement Current Source Density transformation (http://psychophysiology.cpmc.columbia.edu/Software/CSDtoolbox/), see proc_CSD()
 
-# Citation:
-Burwell, S. J., Malone, S. M., Bernat, E. M., & Iacono, W. G. (2014). Does electroencephalogram phase variability account for reduced P3 brain potential in externalizing disorders?. Clinical Neurophysiology, 125(10), 2007-2015. 
-
+# How to use:
+1. Add path to EEGLAB (strongly recommended to use version 14.1.1b or above, issues with pop_resample) 
+2. Execute in the MATLAB terminal: >> eeglab; 
+2. Add the eeg_commander directory to one's MATLAB path
+3. Execute in the MATLAB terminal: >> eeg_commander_startup;
+4.                                 >> help eeg_commander;
+ 
