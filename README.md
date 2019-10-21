@@ -19,10 +19,10 @@ Burwell, S. J., Malone, S. M., Bernat, E. M., & Iacono, W. G. (2014). Does elect
 
 # How to use:
 ```matlab
-%% 1. Add MATLAB path to local copy of EEGLAB (strongly recommended to use version 14.1.1b or above, issues with pop_resample) 
-eeglab; %keeping EEGLAB GUI open is optional, to close, simply type "close;"
-%% 2. Add MATLAB path to local copy of eeg_commander directory
+addpath /path/to/eeglab         %strongly recommended to use version 14.1.1b or above, issues w/ pop_resample()
+eeglab;                         %keeping EEGLAB GUI open is optional, to close, simply type "close;"
+addpath /path/to/eeg_commander
 eeg_commander_startup;
-help eeg_commander;
+help proc_commander;
 ```
  
