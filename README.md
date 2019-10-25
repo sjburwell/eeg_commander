@@ -24,5 +24,27 @@ eeglab;                         %keeping EEGLAB GUI open is optional
 addpath /path/to/eeg_commander  %obtained in bash by "git clone <repo>"
 eeg_commander_startup;          %add necessary eeg_commander paths
 help proc_commander;            %e.g., help for overarching proc_commander (pipeline) function
+
+%% Example pipeline usage, see:
+example_scripts/mctfr-rseeg/run_import_mctfr_rseeg.m
+example_scripts/mctfr-rseeg/run_export_mctfr_rseeg.m
+example_scripts/alcstress/run_import_alcstress_general.m
+example_scripts/alcstress/run_export_alcstress_npueeg.m
+
+%% Other examples: 
+
+% Identify channel (pairs) where electrical distances <2 uV (i.e., putative salt-bridge)
+methods(1).meas = 'Vdist-min';
+methods(1).crit =          2 ;
+methods(1).stat =       'abs';
+salt_bridged = artifact_channels(EEG.data, methods, 0, 1);
+
+% Remove independent component(s) putatively reflecting white noise / muscle artifact
+EEG = bssica_correct_emg(EEG, 1, .80, 'pctbad',25,'detrend',[1 2 3]);
+
+% Do Current Source Density / Laplacian transform
+process.loaddir	= 'EEG';
+process.EEG 	=  EEG ;
+EEG = proc_commander(process,'cfg_CSD');
+
 ```
- 
