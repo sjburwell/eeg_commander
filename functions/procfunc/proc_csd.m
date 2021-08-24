@@ -104,7 +104,7 @@ if ~isempty(args.CSDparms)&&~exist(args.CSDparms,'file'),
 end
 
 %if data has been concatenated, re-epoch
-if length(size(EEG.data))==3,
+if length(size(EEG.data))~=3,
    EEG.data = reshape(EEG.data, EEG.nbchan, EEG.pnts, size(EEG.data,2)/EEG.pnts);
 end
 
