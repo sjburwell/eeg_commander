@@ -2,7 +2,7 @@ clear
 
 % process/CRIT VARS
 process.name           = mfilename;
-process.loaddir        = '~/Downloads/2021.06.16._Stress+AUDTesting/'; %'/labs/ankerlab/data/k01/npu/';
+process.loaddir        = '/labs/ankerlab/data/k01/npu/';
 process.loadflt        = '*.cdt';
 process.loadpop        = 1;
 process.logfile        = 1;
